@@ -1,0 +1,4 @@
+netifaces==0.10.9
+pycairo==1.18.1
+PyGObject==3.32.1
+requests==2.21.0
