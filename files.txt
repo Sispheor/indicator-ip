@@ -1,0 +1,15 @@
+/usr/local/bin/indicator-ip
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/PKG-INFO
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/SOURCES.txt
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/dependency_links.txt
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/entry_points.txt
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/not-zip-safe
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/EGG-INFO/top_level.txt
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/__init__.py
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/__pycache__/__init__.cpython-36.pyc
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/__pycache__/indicator_ip_menu.cpython-36.pyc
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/__pycache__/interface.cpython-36.pyc
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/__pycache__/net_utils.cpython-36.pyc
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/indicator_ip_menu.py
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/interface.py
+/usr/local/lib/python3.6/dist-packages/indicator_ip-1.0-py3.6.egg/indicator_ip/net_utils.py

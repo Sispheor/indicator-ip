@@ -5,8 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='indicator-ip',
-    version='0.1',
-    scripts=['indicator-ip'],
+    version='1.0',
     author="Nicolas Marcq",
     author_email="nico.marcq@gmail.com",
     description="Show all interface IP in gnome taskbar",
@@ -19,4 +18,10 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    python_requires='>=3.6',
+    entry_points={
+        'console_scripts':
+            ['indicator-ip = indicator_ip:main']
+    }
 )
+
