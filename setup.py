@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='indicator-ip',
-    version='1.0',
+    version='1.1.0',
     author="Nicolas Marcq",
     author_email="nico.marcq@gmail.com",
     description="Show all interface IP in gnome taskbar",
@@ -26,6 +26,10 @@ setuptools.setup(
     include_package_data=True,
     package_data={
         'indicator_ip': ['images/*.png']
-    }
+    },
+    data_files=[
+        ('/usr/share/indicator-ip/img', ['indicator_ip/images/ip_white.png']),  # icon
+        ('/etc/xdg/autostart', ['indicator-ip.desktop']),  # auto start
+        ('/usr/share/applications', ['indicator-ip.desktop'])  # desktop entry
+    ],
 )
-

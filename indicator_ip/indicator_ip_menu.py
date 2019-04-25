@@ -5,7 +5,8 @@ from indicator_ip.net_utils import NetUtils
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
-from gi.repository import Gtk, AppIndicator3, Gdk
+gi.require_version('Notify', '0.7')
+from gi.repository import Gtk, AppIndicator3, Gdk, Notify
 
 
 class IndicatorIPMenu(object):
@@ -29,6 +30,8 @@ class IndicatorIPMenu(object):
 
         self.refresh(None)
 
+        self.last_clicked_interface = None
+
     def create_menu(self):
         menu = Gtk.Menu()
 
@@ -46,7 +49,7 @@ class IndicatorIPMenu(object):
         group = None
         for interface in NetUtils.get_all_interface():
             new_radio = Gtk.RadioMenuItem.new_with_label_from_widget(label=str(interface), group=group)
-            new_radio.connect("activate", self.on_clicked_item, interface)
+            new_radio.connect("toggled", self.on_clicked_item, interface)
             new_radio.show()
             if group is None:
                 group = new_radio.get_group()[0]
@@ -70,15 +73,25 @@ class IndicatorIPMenu(object):
         Gtk.main_quit()
 
     def refresh(self, _):
-        print("refresh")
+        # print("refresh")
         self.indicator.set_menu(self.create_menu())
         # set by default the public IP as label
         self.indicator.set_label(str(NetUtils.get_public_interface().ip),
                                  str(NetUtils.get_public_interface().ip))
 
-    def on_clicked_item(self, _, interface):
-        # copy to clipboard the ip
-        self.clipboard.set_text(interface.ip, -1)
-        print("'%s' copied to clipboard" % interface.ip)
-        # update the label so we see the selected ip
-        self.indicator.set_label(str(interface.ip), str(interface.ip))
+    def on_clicked_item(self, button, interface):
+        if button.get_active():
+            if interface != self.last_clicked_interface or self.last_clicked_interface is None:
+                # copy to clipboard the ip
+                self.clipboard.set_text(interface.ip, -1)
+                # print("'%s' copied to clipboard" % interface.ip)
+                # update the label so we see the selected ip
+                self.indicator.set_label(str(interface.ip), str(interface.ip))
+                self.show_notification(str(interface.ip), "copied to clipboard")
+                self.last_clicked_interface = interface
+
+    @staticmethod
+    def show_notification(title, message):
+        Notify.init('indicator-ip')
+        n = Notify.Notification.new(title, message)
+        n.show()

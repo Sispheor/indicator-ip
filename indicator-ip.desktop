@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=indicator-ip
+X-GNOME-Autostart-enabled=true
+Comment=Show system IP of all interface
+Exec=indicator-ip
+Icon=/usr/share/indicator-ip/img/ip_white.png
+Categories=Utility;
+Terminal=false
+StartupNotify=true
