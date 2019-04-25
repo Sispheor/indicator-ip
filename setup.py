@@ -22,6 +22,10 @@ setuptools.setup(
     entry_points={
         'console_scripts':
             ['indicator-ip = indicator_ip:main']
+    },
+    include_package_data=True,
+    package_data={
+        'indicator_ip': ['images/*.png']
     }
 )
 
