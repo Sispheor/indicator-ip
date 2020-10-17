@@ -35,13 +35,10 @@ class NetUtils(object):
 
     @classmethod
     def get_public_ip(cls):
-
-        if cls.current_public_ip is None:
-            try:
-                r = requests.get(cls.DEFAULT_PROVIDER, timeout=5)
-                cls.current_public_ip = r.text.rstrip("\n\r")
-                return cls.current_public_ip
-            except requests.exceptions.Timeout:
-                return cls.NO_IP
-        else:
+        try:
+            r = requests.get(cls.DEFAULT_PROVIDER, timeout=5)
+            cls.current_public_ip = r.text.rstrip("\n\r")
             return cls.current_public_ip
+        except requests.exceptions.Timeout:
+            return cls.NO_IP
+
