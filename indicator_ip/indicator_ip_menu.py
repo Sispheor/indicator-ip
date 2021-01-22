@@ -28,7 +28,7 @@ class IndicatorIPMenu(object):
         self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         self.refresh_freq = 0
-        self.doIterationTimer = None
+        self.do_iteration_timer = None
 
         self.refresh(None)
 
@@ -90,22 +90,20 @@ class IndicatorIPMenu(object):
     def quit(_):
         Gtk.main_quit()
 
-    def refresh(self, w=None):
-        if w is None:
+    def refresh(self, skip_set_menu=None):
+        if skip_set_menu is None:
             self.indicator.set_menu(self.create_menu())
         else:
-            self.doIterationTimer = GObject.timeout_add(self.refresh_freq, self.refresh, True)
+            self.do_iteration_timer = GObject.timeout_add(self.refresh_freq, self.refresh, True)
         # set by default the public IP as label
         self.indicator.set_label(str(NetUtils.get_public_interface().ip),
                                  str(NetUtils.get_public_interface().ip))
 
     def on_clicked_refresh_timer(self, button, refresh_time):
         if button.get_active():
-            print("refresh_time %s" % refresh_time)
-
             if refresh_time == "[OFF] autorefresh":
-                GObject.source_remove(self.doIterationTimer)
-                self.doIterationTimer = None
+                GObject.source_remove(self.do_iteration_timer)
+                self.do_iteration_timer = None
                 return
 
             if refresh_time == "15 sec":
@@ -115,10 +113,10 @@ class IndicatorIPMenu(object):
             elif refresh_time == "1 hour":
                 self.refresh_freq = 60*60*1000
 
-            if self.doIterationTimer is not None:
-                GObject.source_remove(self.doIterationTimer)
-                self.doIterationTimer = None
-            self.doIterationTimer = GObject.timeout_add(self.refresh_freq, self.refresh, True)
+            if self.do_iteration_timer is not None:
+                GObject.source_remove(self.do_iteration_timer)
+                self.do_iteration_timer = None
+            self.do_iteration_timer = GObject.timeout_add(self.refresh_freq, self.refresh, True)
 
     def on_clicked_item(self, button, interface):
         if button.get_active():
