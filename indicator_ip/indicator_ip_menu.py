@@ -6,8 +6,7 @@ from indicator_ip.net_utils import NetUtils
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 gi.require_version('Notify', '0.7')
-from gi.repository import Gtk, AppIndicator3, Gdk, Notify
-
+from gi.repository import Gtk, AppIndicator3, Gdk, Notify, GObject
 
 class IndicatorIPMenu(object):
 
@@ -31,6 +30,8 @@ class IndicatorIPMenu(object):
         self.refresh(None)
 
         self.last_clicked_interface = None
+
+        GObject.timeout_add(3000, self.refresh)
 
     def create_menu(self):
         menu = Gtk.Menu()
@@ -72,12 +73,14 @@ class IndicatorIPMenu(object):
     def quit(_):
         Gtk.main_quit()
 
-    def refresh(self, _):
+    def refresh(self, w=None):
         # print("refresh")
         self.indicator.set_menu(self.create_menu())
         # set by default the public IP as label
         self.indicator.set_label(str(NetUtils.get_public_interface().ip),
                                  str(NetUtils.get_public_interface().ip))
+
+        GObject.timeout_add(3000, self.refresh)
 
     def on_clicked_item(self, button, interface):
         if button.get_active():
