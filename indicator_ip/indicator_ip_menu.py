@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 import gi
@@ -13,6 +14,7 @@ from configparser import ConfigParser
 
 HOME = str(Path.home())
 CONFIG_FILE_PATH = HOME + os.sep + ".config/indicator-ip/config.ini"
+DEFAULT_REFRESH_TIME = ["Disabled", "15 sec", "1 min", "1 hour"]
 
 
 class IndicatorIPMenu(object):
@@ -39,11 +41,14 @@ class IndicatorIPMenu(object):
         # load the configuration
         config = self.load_config_file()
         self.refresh_freq = config.get('main', 'refresh_freq')
-
+        self.last_clicked_interface = config.get('main', 'last_clicked_interface')
         # an object that memory interface timeout
         self.do_iteration_timer = None
+        # save interfaces
+        self.interface_list = NetUtils.get_all_interface()
+        self.interface_map = self.load_interface(self.interface_list)
+        # show the menu
         self.refresh()
-        self.last_clicked_interface = config.get('main', 'last_clicked_interface')
 
     def create_menu(self):
         menu = Gtk.Menu()
@@ -59,11 +64,13 @@ class IndicatorIPMenu(object):
 
         # get all interface
         group_interface = None
-        for interface in NetUtils.get_all_interface():
-            new_radio = Gtk.RadioMenuItem.new_with_label_from_widget(label=str(interface),
+        for interface in self.interface_list:
+            new_radio = Gtk.RadioMenuItem.new_with_label_from_widget(label=str(interface.name),
                                                                      group=group_interface)
             new_radio.connect("toggled", self.on_clicked_item, interface)
             new_radio.show()
+            if interface.name == self.last_clicked_interface:
+                new_radio.set_active(True)
             if group_interface is None:
                 group_interface = new_radio.get_group()[0]
             menu.append(new_radio)
@@ -80,11 +87,13 @@ class IndicatorIPMenu(object):
         item_auto_refresh.set_submenu(refresh_sub_menu)
         # options in sub menu
         selected_refresh_option = None
-        for refresh_time in ["Disabled", "15 sec", "1 min", "1 hour"]:
-            refresh_radio = Gtk.RadioMenuItem.new_with_label_from_widget(label=str(refresh_time),
+        for refresh_time_string in DEFAULT_REFRESH_TIME:
+            refresh_radio = Gtk.RadioMenuItem.new_with_label_from_widget(label=str(refresh_time_string),
                                                                          group=selected_refresh_option)
-            refresh_radio.connect("toggled", self.on_clicked_refresh_timer, refresh_time)
+            refresh_radio.connect("toggled", self.on_clicked_refresh_timer, refresh_time_string)
             refresh_radio.show()
+            if refresh_time_string == self.refresh_freq:
+                refresh_radio.set_active(True)
             if selected_refresh_option is None:
                 selected_refresh_option = refresh_radio.get_group()[0]
             refresh_sub_menu.append(refresh_radio)
@@ -106,36 +115,35 @@ class IndicatorIPMenu(object):
     def quit(_):
         Gtk.main_quit()
 
-    def refresh(self):
-        print("Refreshing")
+    def refresh(self, sub_menu=None):
+        print("Refreshing: {}".format(datetime.now()))
         self.indicator.set_menu(self.create_menu())
-        # set by default the public IP as label
-        self.indicator.set_label(str(NetUtils.get_public_interface().ip),
-                                 str(NetUtils.get_public_interface().ip))
+        # show as main label the last selected interface. by default the public interface
+        current_ip_to_print = self.interface_map[self.last_clicked_interface]
+        self.indicator.set_label(current_ip_to_print,
+                                 current_ip_to_print)
+        if self.refresh_freq != "Disabled":
+            self.enable_auto_refresh()
 
     def enable_auto_refresh(self):
-        self.save_key_in_config_file("refresh_freq", str(self.refresh_freq))
-        refresh_frequency_millisecond = self.refresh_freq * 1000
+        refresh_frequency_millisecond = self.get_refresh_frequency_sec_from_string(self.refresh_freq) * 1000
         self.do_iteration_timer = GObject.timeout_add(refresh_frequency_millisecond, self.refresh)
 
     def disable_auto_refresh(self):
         GObject.source_remove(self.do_iteration_timer)
         self.do_iteration_timer = None
 
-    def on_clicked_refresh_timer(self, button, refresh_time):
+    def on_clicked_refresh_timer(self, button, refresh_time_string):
         if button.get_active():
-            # print(refresh_time)
-            if refresh_time == "Disabled":
+            # print(refresh_time_string)
+            if refresh_time_string == "Disabled":
                 self.disable_auto_refresh()
-                self.save_key_in_config_file("refresh_freq", "0")
             else:
-                if refresh_time == "15 sec":
-                    self.refresh_freq = 15
-                elif refresh_time == "1 min":
-                    self.refresh_freq = 60
-                elif refresh_time == "1 hour":
-                    self.refresh_freq = 60*60
-                self.enable_auto_refresh()
+                if self.refresh_freq != refresh_time_string:
+                    self.disable_auto_refresh()
+                    self.refresh_freq = refresh_time_string
+                    self.enable_auto_refresh()
+                    self.save_key_in_config_file("refresh_freq", self.refresh_freq)
 
     def on_clicked_item(self, button, interface):
         if button.get_active():
@@ -171,7 +179,7 @@ class IndicatorIPMenu(object):
             # Create the configuration file as it doesn't exist yet
             config = ConfigParser()
             config.add_section('main')
-            config.set('main', 'refresh_freq', '0')
+            config.set('main', 'refresh_freq', 'Disabled')
             config.set('main', 'last_clicked_interface', 'public')
             with open(CONFIG_FILE_PATH, 'w') as config_file:
                 config.write(config_file)
@@ -187,3 +195,21 @@ class IndicatorIPMenu(object):
         config.set('main', key, value)
         with open(CONFIG_FILE_PATH, 'w') as config_file:
             config.write(config_file)
+
+    @staticmethod
+    def load_interface(interface_list):
+        interface_map = dict()
+        for interface in interface_list:
+            interface_map[interface.name] = interface.ip
+        # print(interface_map)
+        return interface_map
+
+    @staticmethod
+    def get_refresh_frequency_sec_from_string(refresh_time_string):
+        if refresh_time_string == "15 sec":
+            return 15
+        elif refresh_time_string == "1 min":
+            return 60
+        elif refresh_time_string == "1 hour":
+            return 60 * 60
+        return 0
