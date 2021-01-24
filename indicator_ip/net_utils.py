@@ -39,6 +39,6 @@ class NetUtils(object):
             r = requests.get(cls.DEFAULT_PROVIDER, timeout=5)
             cls.current_public_ip = r.text.rstrip("\n\r")
             return cls.current_public_ip
-        except requests.exceptions.Timeout:
+        except:
             return cls.NO_IP
 

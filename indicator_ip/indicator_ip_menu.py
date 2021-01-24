@@ -39,13 +39,13 @@ class IndicatorIPMenu(object):
         # create config file if not exist
 
         # load the configuration
+        self.interface_list = None
+        self.interface_map = None
         config = self.load_config_file()
         self.refresh_freq = config.get('main', 'refresh_freq')
         self.last_clicked_interface = config.get('main', 'last_clicked_interface')
         # an object that memory interface timeout
         self.do_iteration_timer = None
-        # save interfaces
-        self.refresh_interface_list()
         # show the menu
         self.refresh()
 
@@ -116,11 +116,19 @@ class IndicatorIPMenu(object):
 
     def refresh(self, sub_menu=None):
         print("Refreshing: {}".format(datetime.now()))
-        self.indicator.set_menu(self.create_menu())
         # Refresh network interface list
         self.refresh_interface_list()
+
+        try:
+            current_ip_to_print = self.interface_map[self.last_clicked_interface]
+        except KeyError:
+            # fallback to public address
+            current_ip_to_print = self.interface_map["public"]
+            self.last_clicked_interface = "public"
+            self.save_key_in_config_file("last_clicked_interface", self.last_clicked_interface)
+
+        self.indicator.set_menu(self.create_menu())
         # show as main label the last selected interface. by default the public interface
-        current_ip_to_print = self.interface_map[self.last_clicked_interface]
         self.indicator.set_label(current_ip_to_print,
                                  current_ip_to_print)
         if self.refresh_freq != "Disabled":
