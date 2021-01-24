@@ -131,6 +131,8 @@ class IndicatorIPMenu(object):
         self.do_iteration_timer = GObject.timeout_add(refresh_frequency_millisecond, self.refresh)
 
     def disable_auto_refresh(self):
+        if self.do_iteration_timer is None:
+            return
         GObject.source_remove(self.do_iteration_timer)
         self.do_iteration_timer = None
 
