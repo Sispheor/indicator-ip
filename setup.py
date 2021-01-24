@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='indicator-ip',
-    version='1.1.3',
+    version='1.2.1',
     author="Nicolas Marcq",
     author_email="nico.marcq@gmail.com",
     description="Show all interface IP in gnome taskbar",
