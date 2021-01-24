@@ -45,8 +45,7 @@ class IndicatorIPMenu(object):
         # an object that memory interface timeout
         self.do_iteration_timer = None
         # save interfaces
-        self.interface_list = NetUtils.get_all_interface()
-        self.interface_map = self.load_interface(self.interface_list)
+        self.refresh_interface_list()
         # show the menu
         self.refresh()
 
@@ -118,6 +117,8 @@ class IndicatorIPMenu(object):
     def refresh(self, sub_menu=None):
         print("Refreshing: {}".format(datetime.now()))
         self.indicator.set_menu(self.create_menu())
+        # Refresh network interface list
+        self.refresh_interface_list()
         # show as main label the last selected interface. by default the public interface
         current_ip_to_print = self.interface_map[self.last_clicked_interface]
         self.indicator.set_label(current_ip_to_print,
@@ -132,6 +133,10 @@ class IndicatorIPMenu(object):
     def disable_auto_refresh(self):
         GObject.source_remove(self.do_iteration_timer)
         self.do_iteration_timer = None
+
+    def refresh_interface_list(self):
+        self.interface_list = NetUtils.get_all_interface()
+        self.interface_map = self.load_interface(self.interface_list)
 
     def on_clicked_refresh_timer(self, button, refresh_time_string):
         if button.get_active():
