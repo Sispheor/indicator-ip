@@ -41,4 +41,5 @@ class NetUtils(object):
             return cls.current_public_ip
         except:
             return cls.NO_IP
-
+        except requests.exceptions.ConnectionError:
+            return cls.NO_IP
