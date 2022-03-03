@@ -22,28 +22,26 @@ class IndicatorIPMenu(object):
     def __init__(self) -> None:
         super().__init__()
 
-        icon = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)),
-            'images', 'ip_white.png')
-
-        self.app_id = 'ip-indicator'
-
-        self.indicator = AppIndicator3.Indicator.new(self.app_id,
-                                                     icon,
-                                                     AppIndicator3.IndicatorCategory.OTHER)
-        self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-
-        # prepare the clipboard to receive copied IPs
-        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
 
         # create config file if not exist
-
         # load the configuration
         self.interface_list = None
         self.interface_map = None
         config = self.load_config_file()
         self.refresh_freq = config.get('main', 'refresh_freq')
         self.last_clicked_interface = config.get('main', 'last_clicked_interface')
+        self.icon=config.get('main', 'icon')
+        
+        self.app_id = 'ip-indicator'
+
+        self.indicator = AppIndicator3.Indicator.new(self.app_id,
+                                                     self.icon,
+                                                     AppIndicator3.IndicatorCategory.OTHER)
+        self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+
+        # prepare the clipboard to receive copied IPs
+        self.clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+
         # an object that memory interface timeout
         self.do_iteration_timer = None
         # show the menu
@@ -196,6 +194,9 @@ class IndicatorIPMenu(object):
             config.add_section('main')
             config.set('main', 'refresh_freq', 'Disabled')
             config.set('main', 'last_clicked_interface', 'public')
+            config.set('main', 'icon', os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)),
+                        'images', 'ip_white.png'))
             with open(CONFIG_FILE_PATH, 'w') as config_file:
                 config.write(config_file)
 
