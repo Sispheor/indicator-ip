@@ -6,7 +6,7 @@ Ubuntu indicator that displays local and external IP addresses in your task bar.
 
 ## Installation
 
-Ubuntu 20.04:
+Ubuntu 22.04:
 ```
 sudo add-apt-repository ppa:nico-marcq/indicator-ip
 sudo apt-get update
